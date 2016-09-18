@@ -1,0 +1,56 @@
+<resources>
+    <string name="app_name">myMovieNews</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- INSERT HERE YOUR API KEY which is used in the MainFragment.java
+    within the doInBackground method of the FetchWeatherTask.class -->
+    <string name="api_key_text">ADD YOUR API KEY HERE</string>
+
+    <!-- Detail Activity Strings -->
+    <string name="title_activity_details">Movie Info</string>
+
+    <!-- Menu Strings -->
+    <string name="action_settings">Settings</string>
+    <string name="action_refresh">Refresh</string>
+    <string name="action_show_favourites">Show Favourites</string>
+    <string name="action_hide_favourites">Hide Favourites</string>
+
+
+    <!-- Settings Prefs Strings -->
+    <string name="prefs_sort_by_label" translatable="false">Sort by:</string>
+    <string name="prefs_sort_by_key" translatable="false">sort_by</string>
+    <string name="pref_sort_by_default" translatable="false">popular</string>
+
+    <string-array name="prefs_sort_by_entries">
+        <item>Popularity</item>
+        <item>Rating</item>
+    </string-array>
+
+    <string-array name="prefs_sort_by_entryValues">
+        <item>popular</item>
+        <item>top_rated</item>
+    </string-array>
+
+
+    <!-- Sync Adapter Related -->
+    <string name="sync_account_type">myMovieNews.kikkos.com</string>
+    <string name="content_authority">com.kikkos.myMovieNews</string>
+    <string name="new_movies_downloaded_msg">New Movies downloaded!</string>
+
+    <!-- Movie Data Related -->
+    <string name="poster_path_base_url">https://image.tmdb.org/t/p/w75/</string>
+    <string name="rating_details_text">Rating: </string>
+    <string name="release_date_details_text">Release Date: </string>
+    <string name="overview_details_text">Overview: </string>
+
+    <!-- RecyclerAdapter -->
+    <string name="trailers_text">Trailer: </string>
+    <string name="reviews_text">Review: </string>
+
+    <!-- Favourites Related -->
+    <string name="remove_favourites">Removed from Favourites.</string>
+    <string name="add_favourites">Added to Favourites.</string>
+    <string name="favourites_text">MAKE AS FAVOURITE</string>
+
+
+</resources>
