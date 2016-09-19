@@ -8,13 +8,11 @@
     android:divider="?android:attr/dividerHorizontal"
     tools:context=".MainActivity">
 
-    <fragment
-        android:id="@+id/fragment_main"
-        android:name="com.kikkos.myMovieNews.MainFragment"
+    <FrameLayout
+        android:id="@+id/fragment_main_container_id"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="10"
-        tools:layout="@layout/fragment_main" />
+        android:layout_weight="10" />
 
     <FrameLayout
         android:id="@+id/details_activity_id"

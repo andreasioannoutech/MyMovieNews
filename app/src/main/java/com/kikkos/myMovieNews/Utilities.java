@@ -1,5 +1,6 @@
 package com.kikkos.myMovieNews;
 
+import android.content.AsyncQueryHandler;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -31,9 +32,12 @@ public class Utilities {
             MovieContract.MovieEntry.COLUMN_POSTER_PATH,
             MovieContract.MovieEntry.COLUMN_TITLE,
             MovieContract.MovieEntry.COLUMN_RATING,
+            MovieContract.MovieEntry.COLUMN_POPULARITY,
             MovieContract.MovieEntry.COLUMN_RELEASE_DATE,
             MovieContract.MovieEntry.COLUMN_OVERVIEW,
-            MovieContract.MovieEntry.COLUMN_FAVOURITE
+            MovieContract.MovieEntry.COLUMN_FAVOURITE,
+            MovieContract.MovieEntry.COLUMN_IS_POPULAR,
+            MovieContract.MovieEntry.COLUMN_IS_TOP_RATED
     };
 
     static final int COL_ID = 0;
@@ -41,9 +45,12 @@ public class Utilities {
     static final int COL_POSTER_PATH = 2;
     static final int COL_TITLE = 3;
     static final int COL_RATING = 4;
-    static final int COL_RELEASE_DATE = 5;
-    static final int COL_OVERVIEW = 6;
-    static final int COL_FAVOURITE = 7;
+    static final int COL_POPULARITY = 5;
+    static final int COL_RELEASE_DATE = 6;
+    static final int COL_OVERVIEW = 7;
+    static final int COL_FAVOURITE = 8;
+    static final int COL_IS_POPULAR = 9;
+    static final int COL_IS_TOP_RATED = 10;
 
     // Get sort option value from the preferences.
     public static String getSortingOption(Context context){
@@ -101,6 +108,10 @@ public class Utilities {
         final String MOVIE_ID = "id";
         final String ORIGINAL_TITLE = "title";
         final String VOTE_AVERAGE = "vote_average";
+        final String POPULARITY = "popularity";
+
+        String sort_by = getSortingOption(context);
+        String popular = context.getString(R.string.pref_sort_by_default);
 
         // Splitting into JSON objects and arrays
         JSONArray moviesJsonArray = moviesJson.getJSONArray(RESULTS);
@@ -118,18 +129,30 @@ public class Utilities {
             movieValues.put(MovieContract.MovieEntry.COLUMN_POSTER_PATH, movieJsonObject.getString(POSTER_PATH));
             movieValues.put(MovieContract.MovieEntry.COLUMN_TITLE, movieJsonObject.getString(ORIGINAL_TITLE));
             movieValues.put(MovieContract.MovieEntry.COLUMN_RATING, movieJsonObject.getDouble(VOTE_AVERAGE));
+            movieValues.put(MovieContract.MovieEntry.COLUMN_POPULARITY, movieJsonObject.getDouble(POPULARITY));
             movieValues.put(MovieContract.MovieEntry.COLUMN_RELEASE_DATE, movieJsonObject.getString(RELEASE_DATE));
             movieValues.put(MovieContract.MovieEntry.COLUMN_OVERVIEW, movieJsonObject.getString(OVERVIEW));
             movieValues.put(MovieContract.MovieEntry.COLUMN_FAVOURITE, false);
+
+            if (sort_by.equals(popular)){
+                movieValues.put(MovieContract.MovieEntry.COLUMN_IS_POPULAR, true);
+                movieValues.put(MovieContract.MovieEntry.COLUMN_IS_TOP_RATED, false);
+            }else {
+                movieValues.put(MovieContract.MovieEntry.COLUMN_IS_POPULAR, false);
+                movieValues.put(MovieContract.MovieEntry.COLUMN_IS_TOP_RATED, true);
+            }
 
             movies_id_list.add(String.valueOf(movieJsonObject.getInt(MOVIE_ID)));
 
             cVVector.add(movieValues);
         }
 
-        // compating the movies just downloaded if they already exist in our SQL db.
+        // Remove all non-Favourite movies from SQLite so that we get fresh movies in our db.
+        removeNonFavouriteMoviesLocally(context);
+
+        // comparing the movies just downloaded if they already exist in our SQL db.
         // if they exist in SQL then they are not written again.
-        cVVector = compareNewMoviesWithLocal(context, movies_id_list, cVVector);
+        cVVector = removeAlreadySavedMovies(context, movies_id_list, cVVector, sort_by);
 
         int inserted = 0;
         if (cVVector.size() > 0){
@@ -144,7 +167,7 @@ public class Utilities {
     // Here is the method were i compare the downloaded movie ids with the movies already in the SQL.
     // if they already exist within the SQL then the query will find it and i compare the integer id from the data cursor.
     // if it has a match then i remove it from the Vector<ContentValues> and return it.
-    public static Vector<ContentValues> compareNewMoviesWithLocal(Context context, ArrayList<String> movies_id_list, Vector<ContentValues> cVVector){
+    public static Vector<ContentValues> removeAlreadySavedMovies(Context context, ArrayList<String> movies_id_list, Vector<ContentValues> cVVector, String sort_by){
 
         String whereClause = MovieContract.MovieEntry.COLUMN_MOVIE_ID + " IN (" + makeQueryPlaceholders(movies_id_list.size()) + ")";
         String[] whereArgs = movies_id_list.toArray(new String[movies_id_list.size()]);
@@ -156,6 +179,13 @@ public class Utilities {
                 for (int i = 0; i < cVVector.size(); i++){
                     int movie_id_from_cv = cVVector.get(i).getAsInteger(MovieContract.MovieEntry.COLUMN_MOVIE_ID);
                     if (movie_id_from_cv == data.getInt(COL_MOVIE_ID)){
+                        // here i handling movies fetched from internet based on a sorting option so because the movie found to be already in SQL
+                        // i have to change the sorting status of the matched movie in the SQLite before i remove it from the
+                        // movies to be written in db array. In this way i make sure that it will be displayed in the main view
+                        // if its sorting status matches the query.
+                        // IF ANY MOVIE IS STILL IN THE SQL DB BUT WAS NOT MATCHED HERE IT MEANS IT ONLY EXISTS IN A DIFFERENT
+                        // SORTING OPTION COLLECTION SO WE LET ITS SORTING OPTION AS IT IS.
+                        swapSortingStatusLocally(context, movie_id_from_cv, sort_by);
                         cVVector.remove(i);
                         i = 0;
                     }
@@ -180,12 +210,36 @@ public class Utilities {
         }
     }
 
+    // here i change the status of isTopRated and isPopular based on the sorting preference.
+    public static void swapSortingStatusLocally(Context context, int id, String sort_by){
+        String popular = context.getString(R.string.pref_sort_by_default);
+        ContentValues cv = new ContentValues();
+        if (sort_by.equals(popular)){
+            cv.put(MovieContract.MovieEntry.COLUMN_IS_POPULAR, true);
+            cv.put(MovieContract.MovieEntry.COLUMN_IS_TOP_RATED, false);
+        }else {
+            cv.put(MovieContract.MovieEntry.COLUMN_IS_POPULAR, false);
+            cv.put(MovieContract.MovieEntry.COLUMN_IS_TOP_RATED, true);
+        }
+        String whereClause = MovieContract.MovieEntry.COLUMN_MOVIE_ID + " = ?";
+        String[] whereArgs = new String[]{String.valueOf(id)};
+        context.getContentResolver().update(MovieContract.MovieEntry.CONTENT_URI, cv, whereClause, whereArgs);
+    }
+
     // delete all movies in the SQLite db.
     public static void clearMoviesLocally(Context context){
         context.getContentResolver().delete(MovieContract.MovieEntry.CONTENT_URI, null, null);
     }
 
-    // here i store all the trailers downloaded into an SQL table used as a CACHE for grabbing, viewing and deletting
+    // deleting all non-favourite movies from SQLite
+    public static void removeNonFavouriteMoviesLocally(Context context){
+        String whereClause = MovieContract.MovieEntry.COLUMN_FAVOURITE + " = ?";
+        String[] whereArgs = new String[]{String.valueOf(0)};
+
+        context.getContentResolver().delete(MovieContract.MovieEntry.CONTENT_URI, whereClause, whereArgs);
+    }
+
+    // here i store all the trailers downloaded into an SQL table used as a CACHE for grabbing, viewing and deleting
     // all the trailers.
     public static void storeTrailerUrlsLocally(Context context, JSONObject videos){
         final String YOUTUBE_BASE_URL = "https://www.youtube.com/watch";
@@ -246,7 +300,7 @@ public class Utilities {
 
     // Method for updating the favourite column of the movie within the our SQL local collection of movies.
     // just setting the value to true and false (1 and 0 in SQL).
-    public static void setFavouriteSetting(Context context, int id, boolean status){
+    public static void setFavouriteSetting(final Context context, int id, final boolean status){
         if (id != -1){
             ContentValues cv = new ContentValues();
             cv.put(MovieContract.MovieEntry.COLUMN_FAVOURITE, status);
@@ -254,13 +308,17 @@ public class Utilities {
             String whereClause = MovieContract.MovieEntry.COLUMN_MOVIE_ID + " = ?";
             String[] whereArgs = new String[]{String.valueOf(id)};
 
-            context.getContentResolver().update(MovieContract.MovieEntry.CONTENT_URI, cv, whereClause, whereArgs);
-
-            if (status){
-                Toast.makeText(context, context.getString(R.string.add_favourites), Toast.LENGTH_SHORT).show();
-            }else {
-                Toast.makeText(context, context.getString(R.string.remove_favourites), Toast.LENGTH_SHORT).show();
-            }
+            AsyncQueryHandler queryHandler = new AsyncQueryHandler(context.getContentResolver()) {
+                @Override
+                protected void onUpdateComplete(int token, Object cookie, int result) {
+                    if (status){
+                        Toast.makeText(context, context.getString(R.string.add_favourites), Toast.LENGTH_SHORT).show();
+                    }else {
+                        Toast.makeText(context, context.getString(R.string.remove_favourites), Toast.LENGTH_SHORT).show();
+                    }
+                }
+            };
+            queryHandler.startUpdate(1, null, MovieContract.MovieEntry.CONTENT_URI, cv,whereClause, whereArgs);
         }
     }
 

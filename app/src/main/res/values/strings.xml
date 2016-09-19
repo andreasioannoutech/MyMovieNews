@@ -4,7 +4,7 @@
 
     <!-- INSERT HERE YOUR API KEY which is used in the MainFragment.java
     within the doInBackground method of the FetchWeatherTask.class -->
-    <string name="api_key_text">ADD YOUR API KEY HERE</string>
+    <string name="api_key_text">API KEY HERE</string>
 
     <!-- Detail Activity Strings -->
     <string name="title_activity_details">Movie Info</string>

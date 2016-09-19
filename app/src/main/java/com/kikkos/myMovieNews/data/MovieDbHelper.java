@@ -9,7 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
  */
 public class MovieDbHelper extends SQLiteOpenHelper{
 
-    public static final int DATABASE_VERION = 4;
+    public static final int DATABASE_VERION = 5;
 
     static final String DATABASE_NAME = "movies.db";
 
@@ -27,9 +27,12 @@ public class MovieDbHelper extends SQLiteOpenHelper{
                 MovieContract.MovieEntry.COLUMN_POSTER_PATH + " TEXT NOT NULL, " +
                 MovieContract.MovieEntry.COLUMN_TITLE + " TEXT NOT NULL, " +
                 MovieContract.MovieEntry.COLUMN_RATING + " REAL NOT NULL, " +
+                MovieContract.MovieEntry.COLUMN_POPULARITY + " REAL NOT NULL, " +
                 MovieContract.MovieEntry.COLUMN_RELEASE_DATE + " TEXT NOT NULL, " +
                 MovieContract.MovieEntry.COLUMN_OVERVIEW + " TEXT NOT NULL, " +
-                MovieContract.MovieEntry.COLUMN_FAVOURITE + " INTEGER NOT NULL " +
+                MovieContract.MovieEntry.COLUMN_FAVOURITE + " INTEGER NOT NULL, " +
+                MovieContract.MovieEntry.COLUMN_IS_POPULAR + " INTEGER NOT NULL, " +
+                MovieContract.MovieEntry.COLUMN_IS_TOP_RATED + " INTEGER NOT NULL " +
                 ");";
 
         final String SQL_CREATE_TRAILERS_TABLE = "CREATE TABLE " + MovieContract.TrailerEntry.TABLE_NAME + " (" +

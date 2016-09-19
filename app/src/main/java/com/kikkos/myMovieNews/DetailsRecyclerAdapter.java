@@ -2,6 +2,8 @@ package com.kikkos.myMovieNews;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.util.TypedValue;
@@ -12,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by kikkos on 9/14/2016.
@@ -137,9 +140,17 @@ public class DetailsRecyclerAdapter extends RecyclerView.Adapter<DetailsRecycler
             holder.mView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    // set intent
                     Intent intent = new Intent(Intent.ACTION_VIEW, mUrisList.get(position));
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    mContext.startActivity(intent);
+                    // verify that there is app to get the implicit intent.
+                    PackageManager packageManager = mContext.getPackageManager();
+                    List<ResolveInfo> activities = packageManager.queryIntentActivities(intent, 0);
+                    boolean isIntentSafe = activities.size() > 0;
+                    if (isIntentSafe){
+                        // start intent
+                        mContext.startActivity(intent);
+                    }
                 }
             });
     }

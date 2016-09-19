@@ -8,12 +8,17 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Call
 
     boolean mTwoPane;
     private final static String DETAILFRAGMENT_TAG = "DFTAG";
+    private final static String MAINFRAGMENT_TAG = "MFTAG";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        if (savedInstanceState == null){
+            MainFragment mainFragment = new MainFragment();
+            getSupportFragmentManager().beginTransaction().add(R.id.fragment_main_container_id, mainFragment, MAINFRAGMENT_TAG).commit();
+        }
         // checking here if the details_activity_id layout exists --- should only exist in the sw600dp xml file which
         // is only for tablet mode. If exists then we set the 2 pane mode flag to true and we add the details fragment
         // into that layout.

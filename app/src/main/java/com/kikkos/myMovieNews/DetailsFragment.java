@@ -68,9 +68,12 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
             MovieContract.MovieEntry.COLUMN_POSTER_PATH,
             MovieContract.MovieEntry.COLUMN_TITLE,
             MovieContract.MovieEntry.COLUMN_RATING,
+            MovieContract.MovieEntry.COLUMN_POPULARITY,
             MovieContract.MovieEntry.COLUMN_RELEASE_DATE,
             MovieContract.MovieEntry.COLUMN_OVERVIEW,
-            MovieContract.MovieEntry.COLUMN_FAVOURITE
+            MovieContract.MovieEntry.COLUMN_FAVOURITE,
+            MovieContract.MovieEntry.COLUMN_IS_POPULAR,
+            MovieContract.MovieEntry.COLUMN_IS_TOP_RATED
     };
 
     static final int COL_ID = 0;
@@ -78,9 +81,12 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
     static final int COL_POSTER_PATH = 2;
     static final int COL_TITLE = 3;
     static final int COL_RATING = 4;
-    static final int COL_RELEASE_DATE = 5;
-    static final int COL_OVERVIEW = 6;
-    static final int COL_FAVOURITE = 7;
+    static final int COL_POPULARITY = 5;
+    static final int COL_RELEASE_DATE = 6;
+    static final int COL_OVERVIEW = 7;
+    static final int COL_FAVOURITE = 8;
+    static final int COL_IS_POPULAR = 9;
+    static final int COL_IS_TOP_RATED = 10;
 
     @Nullable
     @Override

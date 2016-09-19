@@ -38,9 +38,12 @@ public class MovieContract {
         public static final String COLUMN_POSTER_PATH = "poster_path";
         public static final String COLUMN_TITLE = "title";
         public static final String COLUMN_RATING = "rating";
+        public static final String COLUMN_POPULARITY = "popularity";
         public static final String COLUMN_RELEASE_DATE = "release_date";
         public static final String COLUMN_OVERVIEW = "overview";
         public static final String COLUMN_FAVOURITE = "favourite";
+        public static final String COLUMN_IS_POPULAR = "is_popular";
+        public static final String COLUMN_IS_TOP_RATED = "is_top_rated";
     }
 
 
