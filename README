@@ -1,2 +1,6 @@
+Udacity Android Developer Nanodegree project
+
+Latest movies info app
+
 IN ORDER FOR THIS APP TO GET DATA FROM THEMOVIEDB.ORG YOU NEED
 TO SPECIFY YOUR API KEY AT: <name="text_api_key"> string field in the strings.xml file.
