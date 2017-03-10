@@ -1,5 +1,5 @@
-# POPULAR MOVIES APP
-Udacity Android Developer Nanodegree project that discovers latest popular movies
+# myMovieNews
+myMovieNews is an app that discovers latest and popular movies and shows relevant information about them. This was created as an Udacity Android Developer Nanodegree project.
 
 ## Gettings started
 1. Download a copy of this repo
