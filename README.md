@@ -1,5 +1,5 @@
-# myMovieNews
-myMovieNews is an app that discovers latest and popular movies and shows relevant information about them. This was created as an Udacity Android Developer Nanodegree project.
+# MyMovieNews Android App with themoviedb.org API
+Discovery the latest and most popular movies and shows and check relevant information about them.
 
 ## Gettings started
 1. Download a copy of this repo
